@@ -5,7 +5,7 @@ description = ""
 authors = ["Santiago Alvarez <santiago.salvarez@mercadolibre.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.2"
 pydantic = "^1.10.2"
 
 [tool.poetry.dev-dependencies]
