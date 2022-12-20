@@ -10,7 +10,7 @@ class RuleEngine:
 
     def __merge_operators(self, operators: List[Operator]=None) -> Dict[str, Operator]:
         merged_operators = {}
-        default_operators: List[Operator] = [Equal()]
+        default_operators: List[Operator] = [Equal]
         if operators is None:
             operators = []
         for p in default_operators + operators:
