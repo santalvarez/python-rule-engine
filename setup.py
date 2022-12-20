@@ -1,17 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
+# Metadata goes in setup.cfg. These are here for GitHub's dependency graph.
 setup(
     name="python-rule-engine",
-    version="0.1.0",
-    license="MIT",
-    author="Santiago Alvarez",
-    author_email="santiagoalvarez264@gmail.com",
-    packages=find_packages("src"),
-    package_dir={"": "src"},
-    url="https://github.com/santalvarez/python-rule-engine",
-    keywords="rule engine json",
     install_requires=[
           "pydantic",
       ],
-
 )
