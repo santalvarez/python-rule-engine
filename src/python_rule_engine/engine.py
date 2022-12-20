@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
-from .operators import *
-from .exceptions import *
-from .models import *
+from .operators import Operator, Equal
+from .exceptions import DuplicateOperatorError, OperatorNotFoundError
+from .models import Rule, SimpleCondition, MultiCondition
 
 class RuleEngine:
     def __init__(self, rules: List[Dict], operators: List[Operator]=None):
