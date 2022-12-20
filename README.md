@@ -44,4 +44,4 @@ results = engine.evaluate(obj)
 
 ```
 
-
+Find more info about the rules [here](docs/rules.md).
