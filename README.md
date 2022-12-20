@@ -7,7 +7,7 @@ A rule engine where rules are defined in JSON format. The syntax of the rules be
 pip install python-rule-engine
 ```
 
-## Quick Example
+## Quick Example
 
 ```python
 from python_rule_engine import RuleEngine
