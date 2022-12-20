@@ -11,14 +11,14 @@ class SimpleCondition(Condition):
     operator: str
     params: dict = {}
     value: Any
-    field: str = None
+    path: str = None
     match_detail: Any = None
 
     # pylint: disable=no-self-argument,no-self-use
-    @validator("field")
-    def validate_field(cls, value):
+    @validator("path")
+    def validate_path(cls, value):
         if value[:2] != "$.":
-            raise ValueError("Invalid Definition: First two chars of 'field' have to be $.")
+            raise ValueError("Invalid Definition: First two chars of 'path' have to be $.")
         return value
 
 class MultiCondition(Condition):

@@ -64,15 +64,15 @@ class RuleEngine:
         :return condition: The condition with added result info
         """
         operator = condition.operator
-        if condition.field:
-            field_obj = self.get_value_from_jsonpath(condition.field, obj)
+        if condition.path:
+            path_obj = self.get_value_from_jsonpath(condition.path, obj)
         else:
-            field_obj = obj
+            path_obj = obj
 
         try:
             match, match_detail = self.operators[operator].match(
                 condition,
-                field_obj,
+                path_obj,
                 self.run_condition)
             condition.match = match
             condition.match_detail = self.obj_to_dict(match_detail)
