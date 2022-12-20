@@ -18,12 +18,12 @@ rule = {
         "all": [
             {
                 "path": "$.person.name",
-                "operator": "equal"
+                "operator": "equal",
                 "value": "Lionel"
             },
             {
                 "path": "$.person.last_name",
-                "operator": "equal"
+                "operator": "equal",
                 "value": "Messi"
             }
         ]
