@@ -81,7 +81,7 @@ class RuleEngine:
             raise OperatorNotFoundError from e
 
     def run_multi_condition(self, multi_condition: MultiCondition, obj: Any) -> MultiCondition:
-        """ Run a rule on an object or dict
+        """ Run a multi condition on an object or dict
 
         :param MultiCondition rule: The rule
         :param Any obj: The object
