@@ -1,8 +1,20 @@
 [tool.poetry]
 name = "python-rule-engine"
 version = "0.1.0"
-description = ""
+description = "A rule engine where rules are written in JSON format"
 authors = ["Santiago Alvarez <santiago.salvarez@mercadolibre.com>"]
+homepage = "https://github.com/santalvarez/python-rule-engine"
+license = "MIT"
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Application Frameworks"
+]
+keywords = ["rule-engine", "rules", "json", "python"]
+
 
 [tool.poetry.dependencies]
 python = "^3.7.2"
