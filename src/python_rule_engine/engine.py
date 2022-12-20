@@ -1,5 +1,7 @@
 from typing import List, Dict, Any
-from .operators import Operator, Equal
+from .operators import (Operator, Equal, NotEqual, LessThan, 
+                        LessThanInclusive, GreaterThan, GreaterThanInclusive, 
+                        In, NotIn, Contains, NotContains)
 from .exceptions import DuplicateOperatorError, OperatorNotFoundError
 from .models import Rule, SimpleCondition, MultiCondition
 
@@ -10,7 +12,9 @@ class RuleEngine:
 
     def __merge_operators(self, operators: List[Operator]=None) -> Dict[str, Operator]:
         merged_operators = {}
-        default_operators: List[Operator] = [Equal]
+        default_operators: List[Operator] = [Equal, NotEqual, LessThan,
+                                             LessThanInclusive, GreaterThan, GreaterThanInclusive,
+                                             In, NotIn, Contains, NotContains]
         if operators is None:
             operators = []
         for p in default_operators + operators:
