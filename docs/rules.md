@@ -31,7 +31,7 @@ A simple condition consists of an operator and a value.
 }
 ```
 
-**operator(str, req):** The operator to use to compare the object with the defined value. Find info on built-in operators and how to define your own here.
+**operator(str, req):** The operator to use to compare the object with the defined value. Find info on built-in operators and how to define your own [here](operators.md).
 
 **path(str):** A [JSONPath](https://goessner.net/articles/JsonPath/) expression indicating what attribute of the object to evaluate.
 
@@ -64,3 +64,12 @@ Contains either the **any** or **all** fields. These fields contain a list of co
 **all(list):** All conditions inside have to match.
 
 **any(list):** One of the conditions inside have to match.
+
+
+## Results
+
+A rule result has the same structure as a rule but with two added fields.
+
+**match(bool):** Indicates wether the condition matched.
+
+**match_detail(bool):** Contains details about the object that matched.
