@@ -1,4 +1,4 @@
-from python_rule_engine import RuleEngine, Operator
+from python_rule_engine import RuleEngine
 
 
 def test_basic_rule_on_dict():
@@ -69,36 +69,3 @@ def test_basic_rule_on_object():
     results = engine.evaluate(obj)
 
     assert results[0].conditions.match is True
-
-def test_custom_operator():
-    class EqualLowercase(Operator):
-        id = "equal_lowercase"
-
-        @staticmethod
-        def match(condition, obj_value, run_condition):
-            return condition.value.lower() == obj_value.lower(), obj_value
-
-    rule = {
-        "name": "test-lowercase",
-        "conditions": {
-            "any": [
-                {
-                    "path": "$.person.name",
-                    "value": "Santiago",
-                    "operator": "equal_lowercase"
-                }
-            ]
-        }
-    }
-
-    obj = {
-        "person": {
-            "name": "SANTIAGO",
-        }
-    }
-
-    engine = RuleEngine([rule], [EqualLowercase])
-
-    result = engine.evaluate(obj)
-
-    assert result[0].conditions.match is True
