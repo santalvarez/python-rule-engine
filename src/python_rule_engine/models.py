@@ -36,6 +36,8 @@ class MultiCondition(Condition):
 
 class Rule(BaseModel):
     name: str
+    description: str = None
+    extra: dict = None
     conditions: MultiCondition
 
 SimpleCondition.update_forward_refs()
