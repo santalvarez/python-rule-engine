@@ -11,6 +11,10 @@ def test_basic_rule_on_dict():
 
     rule = {
         "name": "basic_rule",
+        "description": "Basic rule to test the engine",
+        "extra": {
+            "some_field": "some_value"
+        },
         "conditions": {
             "all": [
                 {
