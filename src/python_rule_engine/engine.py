@@ -84,7 +84,9 @@ class RuleEngine:
         except KeyError as e:
             raise OperatorNotFoundError from e
         except JSONPathValueNotFound as e:
+            condition.match = False
             condition.match_detail = str(e)
+            return condition
 
 
     def run_multi_condition_any(self, multi_condition: MultiCondition, obj: Any) -> MultiCondition:
