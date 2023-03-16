@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-rule-engine"
-version = "0.2.1"
+version = "0.3.0"
 description = "A rule engine where rules are written in JSON format"
 authors = ["Santiago Alvarez <santiago.salvarez@mercadolibre.com>"]
 homepage = "https://github.com/santalvarez/python-rule-engine"
