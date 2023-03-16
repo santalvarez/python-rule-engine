@@ -1,8 +1,8 @@
 from typing import List, Dict, Any
-from .operators import (Operator, Equal, NotEqual, LessThan, 
-                        LessThanInclusive, GreaterThan, GreaterThanInclusive, 
+from .operators import (Operator, Equal, NotEqual, LessThan,
+                        LessThanInclusive, GreaterThan, GreaterThanInclusive,
                         In, NotIn, Contains, NotContains)
-from .exceptions import DuplicateOperatorError, OperatorNotFoundError
+from .exceptions import DuplicateOperatorError, OperatorNotFoundError, JSONPathValueNotFound
 from .models import Rule, SimpleCondition, MultiCondition
 
 class RuleEngine:
@@ -45,18 +45,19 @@ class RuleEngine:
         return obj
 
     def get_value_from_jsonpath(self, jsonpath: str, obj: Any) -> Any:
-        # TODO: This is a very basic implementation, it should be improved
         # Parse the JSONPath string and extract the attribute names
         attribute_names = jsonpath.replace("$.", "").split(".")
 
-        # Iterate over the attribute names and traverse the object to find the value
+        # Traverse the object to find the value
         value = obj
         for name in attribute_names:
-            if isinstance(value, dict):
-                value = value.get(name)
-            else:
-                value = getattr(value, name)
-
+            try:
+                if isinstance(value, dict):
+                    value = value[name]
+                else:
+                    value = getattr(value, name)
+            except (KeyError, AttributeError):
+                raise JSONPathValueNotFound(f"Value not found at path {jsonpath}")
         return value
 
     def run_condition(self, condition: SimpleCondition, obj: Any) -> SimpleCondition:
@@ -68,21 +69,75 @@ class RuleEngine:
         :return condition: The condition with added result info
         """
         operator = condition.operator
-        if condition.path:
-            path_obj = self.get_value_from_jsonpath(condition.path, obj)
-        else:
-            path_obj = obj
-
         try:
-            match, match_detail = self.operators[operator].match(
-                condition,
-                path_obj,
-                self.run_condition)
+            if condition.path:
+                path_obj = self.get_value_from_jsonpath(condition.path, obj)
+            else:
+                path_obj = obj
+
+            match, match_detail = self.operators[operator].match(condition,
+                                                                 path_obj,
+                                                                 self.run_condition)
             condition.match = match
             condition.match_detail = self.obj_to_dict(match_detail)
             return condition
         except KeyError as e:
             raise OperatorNotFoundError from e
+        except JSONPathValueNotFound as e:
+            condition.match = False
+            condition.match_detail = str(e)
+            return condition
+
+
+    def run_multi_condition_any(self, multi_condition: MultiCondition, obj: Any) -> MultiCondition:
+        """
+        Run a multi condition on an object or dict with 'any' type.
+
+        :param multi_condition: The multi condition to be run.
+        :param obj: The object to be tested.
+        :return: The original multi condition with added result info.
+        """
+        conditions = multi_condition.any
+
+        for idx, cond in enumerate(conditions):
+            if isinstance(cond, SimpleCondition):
+                result = self.run_condition(cond, obj)
+            else:
+                result = self.run_multi_condition(cond, obj)
+
+            multi_condition.any[idx] = result
+
+            if result.match:
+                multi_condition.match = True
+                break
+
+        return multi_condition
+
+    def run_multi_condition_all(self, multi_condition: MultiCondition, obj: Any) -> MultiCondition:
+        """
+        Run a multi condition on an object or dict with 'all' type.
+
+        :param multi_condition: The multi condition to be run.
+        :param obj: The object to be tested.
+        :return: The original multi condition with added result info.
+        """
+        conditions = multi_condition.all
+
+        for idx, cond in enumerate(conditions):
+            if isinstance(cond, SimpleCondition):
+                result = self.run_condition(cond, obj)
+            else:
+                result = self.run_multi_condition(cond, obj)
+
+            multi_condition.all[idx] = result
+
+            if not result.match:
+                multi_condition.match = False
+                return multi_condition
+
+        multi_condition.match = True
+        return multi_condition
+
 
     def run_multi_condition(self, multi_condition: MultiCondition, obj: Any) -> MultiCondition:
         """ Run a multi condition on an object or dict
@@ -93,38 +148,9 @@ class RuleEngine:
         """
 
         if multi_condition.any:
-            conditions = multi_condition.any
+            return self.run_multi_condition_any(multi_condition, obj)
         else:
-            conditions = multi_condition.all
-
-        all_match = True
-        for idx, cond in enumerate(conditions):
-            # Add if based on type
-            if isinstance(cond, SimpleCondition):
-                result = self.run_condition(cond, obj)
-            else:
-                result = self.run_multi_condition(cond, obj)
-
-            conditions[idx] = result
-
-            if multi_condition.any:
-                if result.match:
-                    multi_condition.match = True
-                    break
-            else:
-                if not result.match:
-                    all_match = False
-                    break
-
-        if all_match:
-            multi_condition.match = True
-
-        if multi_condition.any:
-            multi_condition.any = conditions
-        else:
-            multi_condition.all = conditions
-
-        return multi_condition
+            return self.run_multi_condition_all(multi_condition, obj)
 
 
     def evaluate(self, obj: Any) -> List[Rule]:
