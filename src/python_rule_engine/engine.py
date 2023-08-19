@@ -5,6 +5,7 @@ from .operators import (Operator, Equal, NotEqual, LessThan,
 from .exceptions import DuplicateOperatorError, OperatorNotFoundError, JSONPathValueNotFound
 from .models import Rule, SimpleCondition, MultiCondition
 
+
 class RuleEngine:
     def __init__(self, rules: List[Dict], operators: List[Operator]=None):
         self.operators: Dict[str, Operator] = self.__merge_operators(operators)
@@ -44,22 +45,6 @@ class RuleEngine:
             return [self.obj_to_dict(v) for v in obj]
         return obj
 
-    def get_value_from_jsonpath(self, jsonpath: str, obj: Any) -> Any:
-        # Parse the JSONPath string and extract the attribute names
-        attribute_names = jsonpath.replace("$.", "").split(".")
-
-        # Traverse the object to find the value
-        value = obj
-        for name in attribute_names:
-            try:
-                if isinstance(value, dict):
-                    value = value[name]
-                else:
-                    value = getattr(value, name)
-            except (KeyError, AttributeError):
-                raise JSONPathValueNotFound(f"Value not found at path {jsonpath}")
-        return value
-
     def run_condition(self, condition: SimpleCondition, obj: Any) -> SimpleCondition:
         """ Run a simple condition on an object
 
@@ -71,7 +56,7 @@ class RuleEngine:
         operator = condition.operator
         try:
             if condition.path:
-                path_obj = self.get_value_from_jsonpath(condition.path, obj)
+                path_obj = condition.path.get_value_from(obj)
             else:
                 path_obj = obj
 
@@ -149,8 +134,8 @@ class RuleEngine:
 
         if multi_condition.any:
             return self.run_multi_condition_any(multi_condition, obj)
-        else:
-            return self.run_multi_condition_all(multi_condition, obj)
+
+        return self.run_multi_condition_all(multi_condition, obj)
 
 
     def evaluate(self, obj: Any) -> List[Rule]:
