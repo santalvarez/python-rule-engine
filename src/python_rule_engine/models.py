@@ -1,7 +1,9 @@
 from __future__ import annotations
 from abc import ABC
-from typing import List, Any, Union
+from typing import List, Any, Union, Optional
 from pydantic import BaseModel, root_validator, validator
+
+from .json_path import JSONPath
 
 
 class Condition(BaseModel, ABC):
@@ -11,15 +13,16 @@ class SimpleCondition(Condition):
     operator: str
     params: dict = {}
     value: Any
-    path: str = None
+    path: Optional[JSONPath] = None
     match_detail: Any = None
 
     # pylint: disable=no-self-argument,no-self-use
-    @validator("path")
-    def validate_path(cls, value):
-        if value[:2] != "$.":
-            raise ValueError("Invalid Definition: First two chars of 'path' have to be $.")
-        return value
+    @validator('path', pre=True)
+    def create_json_path(cls, value: str):
+        return JSONPath(value)
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class MultiCondition(Condition):
     all: List[Union[SimpleCondition, MultiCondition]] = None
