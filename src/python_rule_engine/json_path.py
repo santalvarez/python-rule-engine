@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from jsonpath_ng import parse
 
