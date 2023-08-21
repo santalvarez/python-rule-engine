@@ -1,17 +1,26 @@
-from python_rule_engine.models import SimpleCondition
-from python_rule_engine.operators import Contains
+from python_rule_engine.models.simple_condition import SimpleCondition
 
 
-def test_contains_operator():
-    condition1 = SimpleCondition(value=1, operator="not_contains")
-    condition2 = SimpleCondition(value="Santiago", operator="not_contains")
-    condition3 = SimpleCondition(value=True, operator="not_contains")
+def test_contains_operator_int_array(operators_dict):
+    condition = SimpleCondition(value=1, operator="contains", operators_dict=operators_dict)
 
-    assert Contains.match(condition1, [1, 2, 3], None) == (True, [1,2,3])
-    assert Contains.match(condition1, [2, 3, 4], None) == (False, [2,3,4])
+    condition.evaluate([1, 2, 3])
+    assert (condition.match, condition.match_detail) == (True, [1,2,3])
+    condition.evaluate([2, 3, 4])
+    assert (condition.match, condition.match_detail) == (False, [2,3,4])
 
-    assert Contains.match(condition2, ["Santiago", "Alvarez"], None) == (True, ["Santiago", "Alvarez"])
-    assert Contains.match(condition2, ["Zapata", "Alvarez"], None) == (False, ["Zapata", "Alvarez"])
+def test_contains_string(operators_dict):
+    condition = SimpleCondition(value="Santiago", operator="contains", operators_dict=operators_dict)
 
-    assert Contains.match(condition3, [True, True], None) == (True, [True, True])
-    assert Contains.match(condition3, [False, False], None) == (False, [False, False])
+    condition.evaluate("Santiago Alvarez")
+    assert (condition.match, condition.match_detail) == (True, "Santiago Alvarez")
+    condition.evaluate("Zapata Alvarez")
+    assert (condition.match, condition.match_detail) == (False, "Zapata Alvarez")
+
+def test_contains_bool_array(operators_dict):
+    condition = SimpleCondition(value=True, operator="contains", operators_dict=operators_dict)
+
+    condition.evaluate([True, True])
+    assert (condition.match, condition.match_detail) == (True, [True, True])
+    condition.evaluate([False, False])
+    assert (condition.match, condition.match_detail) == (False, [False, False])

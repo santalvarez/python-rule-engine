@@ -1,17 +1,26 @@
-from python_rule_engine.models import SimpleCondition
-from python_rule_engine.operators import Equal
+from python_rule_engine.models.simple_condition import SimpleCondition
 
 
-def test_equal_operator():
-    condition1 = SimpleCondition(value="Santiago", operator="equal")
-    condition2 = SimpleCondition(value=12345, operator="equal")
-    condition3 = SimpleCondition(value=True, operator="equal")
+def test_equal_string(operators_dict):
+    condition = SimpleCondition(value="Santiago", operator="equal", operators_dict=operators_dict)
 
-    assert Equal.match(condition1, "Santiago", None) == (True, "Santiago")
-    assert Equal.match(condition1, "Not Santiago", None) == (False, "Not Santiago")
+    condition.evaluate("Santiago")
+    assert (condition.match, condition.match_detail) == (True, "Santiago")
+    condition.evaluate("Not Santiago")
+    assert (condition.match, condition.match_detail) == (False, "Not Santiago")
 
-    assert Equal.match(condition2, 12345, None) == (True, 12345)
-    assert Equal.match(condition2, 12346, None) == (False, 12346)
+def test_equal_int(operators_dict):
+    condition = SimpleCondition(value=12345, operator="equal", operators_dict=operators_dict)
 
-    assert Equal.match(condition3, True, None) == (True, True)
-    assert Equal.match(condition3, False, None) == (False, False)
+    condition.evaluate(12345)
+    assert (condition.match, condition.match_detail) == (True, 12345)
+    condition.evaluate(12346)
+    assert (condition.match, condition.match_detail) == (False, 12346)
+
+def test_equal_bool(operators_dict):
+    condition = SimpleCondition(value=True, operator="equal", operators_dict=operators_dict)
+
+    condition.evaluate(True)
+    assert (condition.match, condition.match_detail) == (True, True)
+    condition.evaluate(False)
+    assert (condition.match, condition.match_detail) == (False, False)

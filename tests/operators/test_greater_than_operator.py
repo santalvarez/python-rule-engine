@@ -1,17 +1,32 @@
-from python_rule_engine.models import SimpleCondition
-from python_rule_engine.operators import GreaterThan
+from python_rule_engine.models.simple_condition import SimpleCondition
 
 
-def test_greater_than_operator():
-    condition1 = SimpleCondition(value=10, operator="greater_than")
-    condition2 = SimpleCondition(value=10.5, operator="greater_than")
-    condition3 = SimpleCondition(value="Santiago", operator="greater_than")
+def test_greater_than_int(operators_dict):
+    condition = SimpleCondition(value=10, operator="greater_than", operators_dict=operators_dict)
 
-    assert GreaterThan.match(condition1, 5, None) == (False, 5)
-    assert GreaterThan.match(condition1, 15, None) == (True, 15)
+    condition.evaluate(5)
+    assert (condition.match, condition.match_detail) == (False, 5)
+    condition.evaluate(15)
+    assert (condition.match, condition.match_detail) == (True, 15)
+    condition.evaluate(10)
+    assert (condition.match, condition.match_detail) == (False, 10)
 
-    assert GreaterThan.match(condition2, 10.4, None) == (False, 10.4)
-    assert GreaterThan.match(condition2, 10.6, None) == (True, 10.6)
+def test_greater_than_float(operators_dict):
+    condition = SimpleCondition(value=10.5, operator="greater_than", operators_dict=operators_dict)
 
-    assert GreaterThan.match(condition3, "Alvarez", None) == (False, "Alvarez")
-    assert GreaterThan.match(condition3, "Zapata", None) == (True, "Zapata")
+    condition.evaluate(10.4)
+    assert (condition.match, condition.match_detail) == (False, 10.4)
+    condition.evaluate(10.6)
+    assert (condition.match, condition.match_detail) == (True, 10.6)
+    condition.evaluate(10.5)
+    assert (condition.match, condition.match_detail) == (False, 10.5)
+
+def test_greater_than_str(operators_dict):
+    condition = SimpleCondition(value="Santiago", operator="greater_than", operators_dict=operators_dict)
+
+    condition.evaluate("Alvarez")
+    assert (condition.match, condition.match_detail) == (False, "Alvarez")
+    condition.evaluate("Zapata")
+    assert (condition.match, condition.match_detail) == (True, "Zapata")
+    condition.evaluate("Santiago")
+    assert (condition.match, condition.match_detail) == (False, "Santiago")

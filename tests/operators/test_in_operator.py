@@ -1,17 +1,34 @@
-from python_rule_engine.models import SimpleCondition
-from python_rule_engine.operators import In
+from python_rule_engine.models.simple_condition import SimpleCondition
 
 
-def test_in_operator():
-    condition1 = SimpleCondition(value=[1, 2, 3], operator="in")
-    condition2 = SimpleCondition(value=["Santiago", "Alvarez"], operator="in")
-    condition3 = SimpleCondition(value=[True, False], operator="in")
+def test_in_int(operators_dict):
+    condition = SimpleCondition(value=[1, 2, 3], operator="in", operators_dict=operators_dict)
 
-    assert In.match(condition1, 1, None) == (True, 1)
-    assert In.match(condition1, 4, None) == (False, 4)
+    condition.evaluate(1)
+    assert (condition.match, condition.match_detail) == (True, 1)
+    condition.evaluate(4)
+    assert (condition.match, condition.match_detail) == (False, 4)
 
-    assert In.match(condition2, "Santiago", None) == (True, "Santiago")
-    assert In.match(condition2, "Zapata", None) == (False, "Zapata")
+def test_in_float(operators_dict):
+    condition = SimpleCondition(value=[1.1, 2.2, 3.3], operator="in", operators_dict=operators_dict)
 
-    assert In.match(condition3, True, None) == (True, True)
-    assert In.match(condition3, None, None) == (False, None)
+    condition.evaluate(1.1)
+    assert (condition.match, condition.match_detail) == (True, 1.1)
+    condition.evaluate(4.4)
+    assert (condition.match, condition.match_detail) == (False, 4.4)
+
+def test_in_str(operators_dict):
+    condition = SimpleCondition(value=["Santiago", "Alvarez"], operator="in", operators_dict=operators_dict)
+
+    condition.evaluate("Santiago")
+    assert (condition.match, condition.match_detail) == (True, "Santiago")
+    condition.evaluate("Zapata")
+    assert (condition.match, condition.match_detail) == (False, "Zapata")
+
+def test_in_bool(operators_dict):
+    condition = SimpleCondition(value=[True, False], operator="in", operators_dict=operators_dict)
+
+    condition.evaluate(True)
+    assert (condition.match, condition.match_detail) == (True, True)
+    condition.evaluate(None)
+    assert (condition.match, condition.match_detail) == (False, None)
