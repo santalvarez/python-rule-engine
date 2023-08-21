@@ -17,6 +17,7 @@ rule = {
     "conditions": {
         "all": [
             {
+                # JSONPath support
                 "path": "$.person.name",
                 "operator": "equal",
                 "value": "Lionel"
@@ -30,7 +31,6 @@ rule = {
     }
 }
 
-# You can also pass a non-dict object to match its attributes
 obj = {
     "person": {
         "name": "Lionel",
