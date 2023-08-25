@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any, Optional
 
 from ..exceptions import JSONPathValueNotFound
@@ -16,6 +17,18 @@ class SimpleCondition(Condition):
         self.value: Any = data["value"]
         self.params = data.get('params', {})
         self.match_detail = None
+
+    def __deepcopy__(self, memo):
+        # Do not deep copy the operator, use the same instance
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k == 'operator':
+                setattr(result, k, v)
+            else:
+                setattr(result, k, deepcopy(v, memo))
+        return result
 
     def __validate_path(self, data: dict) -> Optional[JSONPath]:
         if 'path' in data:
