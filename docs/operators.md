@@ -81,9 +81,8 @@ from python_rule_engine import Operator, RuleEngine
 class EqualLowercase(Operator):
     id = "equal_lowercase"
 
-    @staticmethod
-    def match(condition, obj_value, run_condition):
-        return condition.value.lower() == obj_value.lower(), obj_value
+    def match(self, obj_value):
+        return self.condition.value.lower() == obj_value.lower(), obj_value
 
 
 # Load operator to engine
