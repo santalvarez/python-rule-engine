@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-rule-engine"
-version = "0.3.0"
+version = "0.4.0"
 description = "A rule engine where rules are written in JSON format"
 authors = ["Santiago Alvarez <santiago.salvarez@mercadolibre.com>"]
 homepage = "https://github.com/santalvarez/python-rule-engine"
@@ -14,11 +14,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Application Frameworks"
 ]
 keywords = ["rule-engine", "rules", "json", "python"]
-
+requires-python = ">=3.7"
 
 [tool.poetry.dependencies]
 python = "^3.7.2"
-pydantic = "^1.10.2"
+jsonpath-ng = "^1.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"

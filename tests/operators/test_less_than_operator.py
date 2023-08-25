@@ -1,17 +1,32 @@
-from python_rule_engine.models import SimpleCondition
-from python_rule_engine.operators import LessThan
+from python_rule_engine.models.simple_condition import SimpleCondition
 
 
-def test_less_than_operator():
-    condition1 = SimpleCondition(value=10, operator="less_than")
-    condition2 = SimpleCondition(value=10.5, operator="less_than")
-    condition3 = SimpleCondition(value="Santiago", operator="less_than")
+def test_less_than_int(operators_dict):
+    condition = SimpleCondition(value=10, operator="less_than", operators_dict=operators_dict)
 
-    assert LessThan.match(condition1, 5, None) == (True, 5)
-    assert LessThan.match(condition1, 15, None) == (False, 15)
+    condition.evaluate(5)
+    assert (condition.match, condition.match_detail) == (True, 5)
+    condition.evaluate(15)
+    assert (condition.match, condition.match_detail) == (False, 15)
+    condition.evaluate(10)
+    assert (condition.match, condition.match_detail) == (False, 10)
 
-    assert LessThan.match(condition2, 10.4, None) == (True, 10.4)
-    assert LessThan.match(condition2, 10.6, None) == (False, 10.6)
+def test_less_than_float(operators_dict):
+    condition = SimpleCondition(value=10.5, operator="less_than", operators_dict=operators_dict)
 
-    assert LessThan.match(condition3, "Alvarez", None) == (True, "Alvarez")
-    assert LessThan.match(condition3, "Zapata", None) == (False, "Zapata")
+    condition.evaluate(10.4)
+    assert (condition.match, condition.match_detail) == (True, 10.4)
+    condition.evaluate(10.6)
+    assert (condition.match, condition.match_detail) == (False, 10.6)
+    condition.evaluate(10.5)
+    assert (condition.match, condition.match_detail) == (False, 10.5)
+
+def test_less_than_str(operators_dict):
+    condition = SimpleCondition(value="Santiago", operator="less_than", operators_dict=operators_dict)
+
+    condition.evaluate("Alvarez")
+    assert (condition.match, condition.match_detail) == (True, "Alvarez")
+    condition.evaluate("Zapata")
+    assert (condition.match, condition.match_detail) == (False, "Zapata")
+    condition.evaluate("Santiago")
+    assert (condition.match, condition.match_detail) == (False, "Santiago")
