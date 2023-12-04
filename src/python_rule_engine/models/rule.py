@@ -10,4 +10,3 @@ class Rule:
         conditions = validate_value(data.get("conditions"), dict, "conditions")
         conditions["operators_dict"] = operators_dict
         self.conditions = MultiCondition(**conditions)
-

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Type
 
 from .exceptions import DuplicateOperatorError
 from .models.rule import Rule
@@ -9,24 +9,26 @@ from .operators import (Contains, Equal, GreaterThan, GreaterThanInclusive, In,
 
 
 class RuleEngine:
-    def __init__(self, rules: List[Dict], operators: List[Operator]=None):
-        self.operators: Dict[str, Operator] = self.__merge_operators(operators)
-        self.rules = self.__deserialize_rules(rules)
+    default_operators: List[Type[Operator]] = [Equal, NotEqual, LessThan,
+                                               LessThanInclusive, GreaterThan, GreaterThanInclusive,
+                                               In, NotIn, Contains, NotContains]
 
-    def __merge_operators(self, operators: List[Operator]=None) -> Dict[str, Operator]:
+    def __init__(self, rules: List[Dict], operators: Optional[List[Operator]] = None):
+        self.operators: Dict[str, Type[Operator]] = self._merge_operators(operators)
+        self.rules = self._deserialize_rules(rules)
+
+    def _merge_operators(self, operators: Optional[List[Type[Operator]]] = None) -> Dict[str, Type[Operator]]:
         merged_operators = {}
-        default_operators: List[Operator] = [Equal, NotEqual, LessThan,
-                                             LessThanInclusive, GreaterThan, GreaterThanInclusive,
-                                             In, NotIn, Contains, NotContains]
+
         if operators is None:
             operators = []
-        for p in default_operators + operators:
+        for p in self.default_operators + operators:
             if p.id in merged_operators:
                 raise DuplicateOperatorError
             merged_operators[p.id] = p
         return merged_operators
 
-    def __deserialize_rules(self, rules: List[Dict]) -> List[Rule]:
+    def _deserialize_rules(self, rules: List[Dict]) -> List[Rule]:
         aux_rules = []
         for rule in rules:
             aux_rules.append(Rule(rule, self.operators))
