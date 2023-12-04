@@ -16,7 +16,7 @@ class MultiCondition(Condition):
         self.all = self.__validate_conditions(data.get("all", []), data["operators_dict"])
         self.any = self.__validate_conditions(data.get("any", []), data["operators_dict"])
 
-    def __validate_conditions(self, data: List[dict], operators_dict) -> Optional[Condition]:
+    def __validate_conditions(self, data: List[dict], operators_dict) -> Optional[List[Condition]]:
         if not data:
             return None
         cds = []
