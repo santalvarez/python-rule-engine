@@ -13,9 +13,12 @@ A basic rule consists of a name and a multi condition
 }
 ```
 
-**name(str, req):** The name of the rule
-
-**conditions(dict, req):** A [multi condition](#multi-condition). Defining a simple condition in here is not allowed, it needs to be inside a multi condition.
+| key | description | type | required |
+| --- | --- | --- | --- |
+| name | The name of the rule | str | yes |
+| description | A description of the rule. | str | no |
+| conditions | A [multi condition](#multi-condition). All rules start with a multi condition. | dict | yes |
+| extra | A dict that can be used to store extra information about the rule. | dict | no |
 
 ## Condition Types
 
@@ -30,19 +33,19 @@ A simple condition consists of an operator and a value.
     "value": "John"
 }
 ```
+Table describing the keys:
 
-**operator(str, req):** The operator to use to compare the object with the defined value. Find info on built-in operators and how to define your own [here](operators.md).
-
-**path(str):** A [JSONPath](https://goessner.net/articles/JsonPath/) expression indicating what attribute of the object to evaluate.
-
-**value(any, req):** The value that will be used to compare with the object.
-
-**params(dict):** A dict that can provide the operator more information about how to process the object.
+| key | description | type | required |
+| --- | --- | --- | --- |
+| operator | The operator to use to compare the object with the defined value. Find info on built-in operators and how to define your own [here](operators.md). | str | yes |
+| path | A [JSONPath](https://goessner.net/articles/JsonPath/) expression indicating what attribute of the object to evaluate. Appart from accessing attributes it also supports accessing array elements by [index]. | str | no |
+| value | The value that will be used to compare with the object. | any | yes |
+| params | A dict that can provide the operator more information about how to process the object. | dict | no |
 
 
 ### Multi Condition
 
-Contains either the **any** or **all** fields. These fields contain a list of conditions that can be simple, multi or a mix of both.
+Contains either the **any**, **all** or **not** fields. These fields contain a list of conditions that can be simple, multi or a mix of both.
 
 ```json
 {
@@ -61,9 +64,12 @@ Contains either the **any** or **all** fields. These fields contain a list of co
 }
 ```
 
-**all(list):** All conditions inside have to match.
-
-**any(list):** One of the conditions inside have to match.
+Only one of these fields can be present in a multi condition.
+| key | description | type |
+| --- | --- | --- |
+| all | All conditions inside have to match. | list |
+| any | One of the conditions inside have to match. | list |
+| not | The result of the condition inside will be negated. | dict |
 
 
 ## Results
