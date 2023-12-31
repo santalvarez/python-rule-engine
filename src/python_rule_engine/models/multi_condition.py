@@ -9,12 +9,13 @@ from .simple_condition import SimpleCondition
 class MultiCondition(Condition):
     def __init__(self, **data) -> None:
         super().__init__()
-        if "all" in data and "any" in data:
-            raise ValueError("Only one operator is supported")
-        if "all" not in data and "any" not in data:
-            raise ValueError("No valid operators found")
+
+        if sum([bool(data.get("any", [])), bool(data.get("all", [])), bool(data.get("not", {}))]) != 1:
+            raise ValueError("Only one of any, all or not can be defined")
+
         self.all = self.__validate_conditions(data.get("all", []), data["operators_dict"])
         self.any = self.__validate_conditions(data.get("any", []), data["operators_dict"])
+        self.not_ = self.__validate_not_condition(data.get("not", {}), data["operators_dict"])
 
     def __validate_conditions(self, data: List[dict], operators_dict) -> Optional[List[Condition]]:
         if not data:
@@ -28,12 +29,19 @@ class MultiCondition(Condition):
                 cds.append(MultiCondition(**cd))
         return cds
 
+    def __validate_not_condition(self, data: dict, operators_dict) -> Optional[Condition]:
+        if not data:
+            return None
+        data["operators_dict"] = operators_dict
+        try:
+            return SimpleCondition(**data)
+        except ValueError:
+            return MultiCondition(**data)
+
     def evaluate(self, obj):
         """ Run a multi condition on an object or dict
 
-        :param MultiCondition rule: The rule
         :param Any obj: The object
-        :return Rule: The original rule with aded result info
         """
 
         if self.any:
@@ -43,11 +51,9 @@ class MultiCondition(Condition):
 
     def evaluate_any(self, obj):
         """
-        Run a multi condition on an object or dict with 'any' type.
+        Run a multi condition on a dict with 'any' type.
 
-        :param multi_condition: The multi condition to be run.
         :param obj: The object to be tested.
-        :return: The original multi condition with added result info.
         """
 
         for _, cond in enumerate(self.any):
@@ -59,11 +65,9 @@ class MultiCondition(Condition):
 
     def evaluate_all(self, obj):
         """
-        Run a multi condition on an object or dict with 'all' type.
+        Run a multi condition on a dict with 'all' type.
 
-        :param multi_condition: The multi condition to be run.
         :param obj: The object to be tested.
-        :return: The original multi condition with added result info.
         """
 
         for _, cond in enumerate(self.all):
@@ -74,3 +78,14 @@ class MultiCondition(Condition):
                 return
 
         self.match = True
+
+    def evaluate_not(self, obj):
+        """
+        Run a multi condition on a dict with 'not' type.
+
+        :param obj: The object to be tested.
+        """
+
+        self.not_.evaluate(obj)
+
+        self.match = not self.not_.match
