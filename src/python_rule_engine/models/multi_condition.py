@@ -47,7 +47,10 @@ class MultiCondition(Condition):
         if self.any:
             return self.evaluate_any(obj)
 
-        return self.evaluate_all(obj)
+        if self.all:
+            return self.evaluate_all(obj)
+
+        return self.evaluate_not(obj)
 
     def evaluate_any(self, obj):
         """
