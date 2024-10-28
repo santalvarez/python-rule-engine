@@ -7,6 +7,7 @@ class Rule:
         self.name = validate_value(data.get("name"), str, "name")
         self.description = validate_value(data.get("description"), str, "description", nullable=True)
         self.extra = validate_value(data.get("extra"), dict, "extra", nullable=True)
+        self.event = validate_value(data.get("event"), dict, "event", nullable=True)
         conditions = validate_value(data.get("conditions"), dict, "conditions")
         conditions["operators_dict"] = operators_dict
         self.conditions = MultiCondition(**conditions)
