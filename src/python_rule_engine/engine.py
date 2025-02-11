@@ -1,18 +1,11 @@
-from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type
 
 from .exceptions import DuplicateOperatorError
 from .models.rule import Rule
-from .operators import (Contains, Equal, GreaterThan, GreaterThanInclusive, In,
-                        LessThan, LessThanInclusive, NotContains, NotEqual,
-                        NotIn, Operator)
+from .operators import DEFAULT_OPERATORS, Operator
 
 
 class RuleEngine:
-    default_operators: List[Type[Operator]] = [Equal, NotEqual, LessThan,
-                                               LessThanInclusive, GreaterThan, GreaterThanInclusive,
-                                               In, NotIn, Contains, NotContains]
-
     def __init__(self, rules: List[Dict], operators: Optional[List[Operator]] = None):
         self.operators: Dict[str, Type[Operator]] = self._merge_operators(operators)
         self.rules = self._deserialize_rules(rules)
@@ -22,7 +15,7 @@ class RuleEngine:
 
         if operators is None:
             operators = []
-        for p in self.default_operators + operators:
+        for p in DEFAULT_OPERATORS + operators:
             if p.id in merged_operators:
                 raise DuplicateOperatorError
             merged_operators[p.id] = p
@@ -31,7 +24,7 @@ class RuleEngine:
     def _deserialize_rules(self, rules: List[Dict]) -> List[Rule]:
         aux_rules = []
         for rule in rules:
-            aux_rules.append(Rule(rule, self.operators))
+            aux_rules.append(Rule(**rule, operators_dict=self.operators))
         return aux_rules
 
     def evaluate(self, obj: Any) -> List[Rule]:
@@ -42,7 +35,7 @@ class RuleEngine:
         """
         results = []
         for rule in self.rules:
-            rule_copy = deepcopy(rule)
+            rule_copy = rule.model_copy(deep=True)
             rule_copy.conditions.evaluate(obj)
 
             if rule_copy.conditions.match:

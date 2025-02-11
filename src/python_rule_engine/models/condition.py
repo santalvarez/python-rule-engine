@@ -1,7 +1,8 @@
+from pydantic import BaseModel
 
-class Condition:
-    def __init__(self) -> None:
-        self.match = False
+
+class Condition(BaseModel):
+    match: bool = False
 
     def evaluate(self, obj):
         raise NotImplementedError

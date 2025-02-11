@@ -1,42 +1,40 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Dict, List, Union
+
+from pydantic import Field, model_validator
 
 from .condition import Condition
 from .simple_condition import SimpleCondition
 
 
 class MultiCondition(Condition):
-    def __init__(self, **data) -> None:
-        super().__init__()
+    any: List[Union[SimpleCondition, MultiCondition]] = None
+    all: List[Union[SimpleCondition, MultiCondition]] = None
+    not_: Union[SimpleCondition, MultiCondition] = Field(None, alias="not")
 
-        if sum([bool(data.get("any", [])), bool(data.get("all", [])), bool(data.get("not", {}))]) != 1:
+    operators_dict: Dict = Field(..., exclude=True)
+
+    @model_validator(mode="after")
+    def validate_conditions(self):
+        if sum([bool(self.any), bool(self.all), bool(self.not_)]) != 1:
             raise ValueError("Only one of any, all or not can be defined")
+        return self
 
-        self.all = self.__validate_conditions(data.get("all", []), data["operators_dict"])
-        self.any = self.__validate_conditions(data.get("any", []), data["operators_dict"])
-        self.not_ = self.__validate_not_condition(data.get("not", {}), data["operators_dict"])
+    @model_validator(mode="before")
+    @classmethod
+    def set_operators_dict(cls, values):
+        operators_dict = values["operators_dict"]
 
-    def __validate_conditions(self, data: List[dict], operators_dict) -> Optional[List[Condition]]:
-        if not data:
-            return None
-        cds = []
-        for cd in data:
-            cd["operators_dict"] = operators_dict
-            try:
-                cds.append(SimpleCondition(**cd))
-            except ValueError:
-                cds.append(MultiCondition(**cd))
-        return cds
+        for key in ["any", "all"]:
+            if values.get(key):
+                for item in values[key]:
+                    item["operators_dict"] = operators_dict
 
-    def __validate_not_condition(self, data: dict, operators_dict) -> Optional[Condition]:
-        if not data:
-            return None
-        data["operators_dict"] = operators_dict
-        try:
-            return SimpleCondition(**data)
-        except ValueError:
-            return MultiCondition(**data)
+        if values.get("not"):
+            values["not"]["operators_dict"] = operators_dict
+
+        return values
 
     def evaluate(self, obj):
         """ Run a multi condition on an object or dict
