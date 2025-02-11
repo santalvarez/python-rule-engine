@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Any, Dict, Optional
 
 from pydantic import Field, model_validator, PrivateAttr
@@ -20,7 +19,7 @@ class SimpleCondition(Condition):
     operator: str = Field(..., description="The operator to use for the comparison")
     value: Any = Field(..., description="The value to compare against")
     params: dict = Field({}, description="Additional parameters for the operator")
-    match_detail: Any = None
+    match_detail: SkipJsonSchema[Any] = None
 
     def __deepcopy__(self, memo=None):
         return self.model_copy(deep=False)

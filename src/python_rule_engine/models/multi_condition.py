@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, List, Union
 
 from pydantic import Field, model_validator
+from pydantic.json_schema import SkipJsonSchema
 
 from .condition import Condition
 from .simple_condition import SimpleCondition
@@ -13,7 +14,7 @@ class MultiCondition(Condition):
     all: List[Union[SimpleCondition, MultiCondition]] = None
     not_: Union[SimpleCondition, MultiCondition] = Field(None, alias="not")
 
-    operators_dict: Dict = Field(..., exclude=True)
+    operators_dict: SkipJsonSchema[Dict] = Field(..., exclude=True)
 
     @model_validator(mode="after")
     def validate_conditions(self):
