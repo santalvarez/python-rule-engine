@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional
 from pydantic import Field, model_validator, PrivateAttr
 from pydantic.json_schema import SkipJsonSchema
 
-from ..exceptions import JSONPathValueNotFound
+from ..errors import JSONPathValueNotFoundError
 from ..json_path import JSONPath
-from ..operators import Operator, DEFAULT_OPERATORS
+from ..operators import Operator
 from .condition import Condition
 
 
@@ -16,8 +16,7 @@ class SimpleCondition(Condition):
     _operator_object: SkipJsonSchema[Optional[Operator]] = PrivateAttr(None)
 
     path: Optional[JSONPath] = Field(None, description="A JSONPath expression to extract a value from the object")
-    operator: str = Field(..., description="The operator to use for the comparison",
-                          examples=[o.id for o in DEFAULT_OPERATORS])
+    operator: str = Field(..., description="The operator to use for the comparison")
     value: Any = Field(..., description="The value to compare against")
     params: dict = Field({}, description="Additional parameters for the operator")
     match_detail: SkipJsonSchema[Any] = None
@@ -65,6 +64,6 @@ class SimpleCondition(Condition):
             match, match_detail = self._operator_object.match(path_obj)
             self.match = match
             self.match_detail = self.__obj_to_dict(match_detail)
-        except JSONPathValueNotFound as e:
+        except JSONPathValueNotFoundError as e:
             self.match = False
             self.match_detail = str(e)

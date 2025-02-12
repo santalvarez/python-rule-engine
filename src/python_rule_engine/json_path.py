@@ -3,7 +3,7 @@ from typing import Any
 from jsonpath_ng import parse
 from pydantic_core import core_schema
 
-from .exceptions import JSONPathValueNotFound
+from .errors import JSONPathValueNotFoundError
 
 
 class JSONPath(str):
@@ -19,7 +19,7 @@ class JSONPath(str):
     def get_value_from(self, obj: Any) -> Any:
         result = self.parsed.find(obj)
         if len(result) == 0:
-            raise JSONPathValueNotFound(f"Value not found at path {self}")
+            raise JSONPathValueNotFoundError(f"Value not found at path {self}")
 
         if len(result) == 1:
             return result[0].value

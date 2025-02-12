@@ -3,7 +3,7 @@ from typing import Dict, Optional, Type
 from pydantic import BaseModel, Field, model_validator
 from pydantic.json_schema import SkipJsonSchema
 
-from ..operators import Operator, DEFAULT_OPERATORS
+from ..operators import Operator
 from .multi_condition import MultiCondition
 
 
@@ -14,9 +14,10 @@ class Rule(BaseModel):
     event: Dict = {}
     conditions: MultiCondition = Field(..., description="The conditions that must be met for the rule to trigger")
 
-    operators_dict: SkipJsonSchema[Dict[str, Type[Operator]]] = Field(DEFAULT_OPERATORS,
-                                                      description="A dictionary of operators to use in the conditions",
-                                                      exclude=True)
+    operators_dict: SkipJsonSchema[Dict[str, Type[Operator]]] = Field(
+        ...,
+        description="A dictionary of operators to use in the conditions",
+        exclude=True)
 
     @model_validator(mode="before")
     @classmethod
