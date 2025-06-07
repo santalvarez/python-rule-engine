@@ -1,38 +1,35 @@
-from copy import deepcopy
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional
 
-from .exceptions import DuplicateOperatorError
 from .models.rule import Rule
-from .operators import (Contains, Equal, GreaterThan, GreaterThanInclusive, In,
-                        LessThan, LessThanInclusive, NotContains, NotEqual,
-                        NotIn, Operator)
+from .operators import Operator
+from .decoder import RuleDecoder
 
 
 class RuleEngine:
-    default_operators: List[Type[Operator]] = [Equal, NotEqual, LessThan,
-                                               LessThanInclusive, GreaterThan, GreaterThanInclusive,
-                                               In, NotIn, Contains, NotContains]
-
     def __init__(self, rules: List[Dict], operators: Optional[List[Operator]] = None):
-        self.operators: Dict[str, Type[Operator]] = self._merge_operators(operators)
-        self.rules = self._deserialize_rules(rules)
+        self.decoder = RuleDecoder(operators)
+        self.rules = self.decoder.decode_rules(rules)
 
-    def _merge_operators(self, operators: Optional[List[Type[Operator]]] = None) -> Dict[str, Type[Operator]]:
-        merged_operators = {}
+    def add_rule(self, rule: Dict):
+        """ Add a rule to the engine
 
-        if operators is None:
-            operators = []
-        for p in self.default_operators + operators:
-            if p.id in merged_operators:
-                raise DuplicateOperatorError
-            merged_operators[p.id] = p
-        return merged_operators
+        :param Dict rule: The rule to add
+        """
+        self.rules.append(self.decoder.decode_rule(rule))
 
-    def _deserialize_rules(self, rules: List[Dict]) -> List[Rule]:
-        aux_rules = []
-        for rule in rules:
-            aux_rules.append(Rule(rule, self.operators))
-        return aux_rules
+    def add_str_rule(self, rule: str):
+        """ Add a rule to the engine
+
+        :param str rule: The rule to add
+        """
+        self.rules.append(self.decoder.decode_str_rule(rule))
+
+    def remove_rule(self, rule_name: str):
+        """ Remove a rule from the engine
+
+        :param str rule_name: The name of the rule to remove
+        """
+        self.rules = [rule for rule in self.rules if rule.name != rule_name]
 
     def evaluate(self, obj: Any) -> List[Rule]:
         """ Evaluate an object on the loaded rules
@@ -42,7 +39,7 @@ class RuleEngine:
         """
         results = []
         for rule in self.rules:
-            rule_copy = deepcopy(rule)
+            rule_copy = rule.model_copy(deep=True)
             rule_copy.conditions.evaluate(obj)
 
             if rule_copy.conditions.match:

@@ -1,7 +1,9 @@
+from pydantic import BaseModel
+from pydantic.json_schema import SkipJsonSchema
 
-class Condition:
-    def __init__(self) -> None:
-        self.match = False
+
+class Condition(BaseModel):
+    match: SkipJsonSchema[bool] = False
 
     def evaluate(self, obj):
-        raise NotImplementedError
+        """ Evaluate the condition on an object """

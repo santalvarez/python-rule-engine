@@ -1,6 +1,5 @@
-from typing import Tuple, Any
 from abc import ABC, abstractmethod
-
+from typing import Any, Tuple, List, Type
 
 
 class Operator(ABC):
@@ -92,3 +91,7 @@ class NotContains(Operator):
         """ Return True if the object value does not contain the condition value"""
         return self.condition.value not in obj_value, obj_value
 
+
+DEFAULT_OPERATORS: List[Type[Operator]] = [
+    Equal, NotEqual, LessThan, LessThanInclusive, GreaterThan,
+    GreaterThanInclusive, In, NotIn, Contains, NotContains]
