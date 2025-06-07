@@ -78,4 +78,4 @@ A rule result has the same structure as a rule but with two added fields.
 
 **match(bool):** Indicates wether the condition matched.
 
-**match_detail(bool):** Contains details about the object that matched.
+**match_detail(any):** Contains details about the object that matched.
