@@ -14,7 +14,7 @@ class JSONPathValueNotFoundError(RuleEngineBaseError):
 class RuleDecodeError(RuleEngineBaseError):
     """ Base error for all rule decoding errors """
 
-class InvalidRuleSchemaError(RuleDecodeError, ValidationError):
+class InvalidRuleSchemaError(RuleDecodeError):
     """ Raised when the field of the provided rule don't match with the rule's schema """
 
 class InvalidRuleTypeError(RuleDecodeError):

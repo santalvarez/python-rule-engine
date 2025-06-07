@@ -47,18 +47,5 @@ class RuleDecoder:
         try:
             rule_dict = json.loads(rule)
             return Rule(**rule_dict, operators_dict=self.operators)
-        except ValidationError as e:
+        except (JSONDecodeError, ValidationError) as e:
             raise InvalidRuleSchemaError from e
-        except JSONDecodeError as e:
-            raise InvalidRuleJSONError
-
-    def rule_schema(self) -> Dict[str, Any]:
-        schema = Rule.model_json_schema()
-
-        operator_names = list(self.operators.keys())
-
-        schema["$defs"]["SimpleCondition"]["properties"]["operator"]["examples"] = operator_names
-
-        return schema
-
-

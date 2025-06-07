@@ -102,3 +102,53 @@ def test_rule_with_not_condition():
     results = engine.evaluate(obj)
 
     assert results[0].conditions.match is True
+
+def test_rule_engine_add_rule():
+    obj = {
+        "person": {
+            "name": "Santiago",
+            "last_name": "Alvarez"
+        }
+    }
+    engine = RuleEngine([])
+
+    engine.add_rule({"name": "test", "conditions": {"all": [{"path": "$.person.name", "value": "Santiago", "operator": "equal"}]}})
+
+    results = engine.evaluate(obj)
+
+    assert results[0].conditions.match is True
+
+def test_rule_engine_add_str_rule():
+    obj = {
+        "person": {
+            "name": "Santiago",
+            "last_name": "Alvarez"
+        }
+    }
+
+    engine = RuleEngine([])
+
+    engine.add_str_rule('{"name": "test", "conditions": {"all": [{"path": "$.person.name", "value": "Santiago", "operator": "equal"}]}}')
+
+    results = engine.evaluate(obj)
+
+    assert results[0].conditions.match is True
+
+def test_rule_engine_remove_rule():
+    obj = {
+        "person": {
+            "name": "Santiago",
+            "last_name": "Alvarez"
+        }
+    }
+    engine = RuleEngine([])
+
+    engine.add_rule({"name": "test", "conditions": {"all": [{"path": "$.person.name", "value": "Santiago", "operator": "equal"}]}})
+
+    results = engine.evaluate(obj)
+
+    assert results[0].conditions.match is True
+
+    engine.remove_rule("test")
+
+    assert not engine.evaluate(obj)

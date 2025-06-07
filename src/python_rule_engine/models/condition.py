@@ -6,4 +6,4 @@ class Condition(BaseModel):
     match: SkipJsonSchema[bool] = False
 
     def evaluate(self, obj):
-        raise NotImplementedError
+        """ Evaluate the condition on an object """

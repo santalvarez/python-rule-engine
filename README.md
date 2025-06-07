@@ -51,36 +51,3 @@ engine = RuleEngine([rule])
 results = engine.evaluate(obj)
 
 ```
-
-## Generating rules with ChatGPT
-You can leverage the Rule's model definition to generate rules using ChatGPT. The following example shows how to generate a rule using OpenAI's API. More info on how to use the API can be found [here](https://platform.openai.com/docs/guides/structured-outputs).
-
-```python
-from openai import OpenAI
-from python_rule_engine import Rule
-
-
-obj = {
-    "player": {
-        "name": "Lionel",
-        "age": 34,
-    }
-}
-
-client = OpenAI(api_key="your_api_key")
-
-completion = client.beta.chat.completions.parse(
-    model="gpt-4o-2024-08-06",
-    messages=[
-        {"role": "system", "content": "Generate a json rule that matches the following conditions:"},
-        {"role": "user", "content": "Create a rule that matches if the player's name is Lionel and the player's age bigger than 30"},
-    ],
-    response_format=Rule,
-)
-
-rule = completion.choices[0].message.parsed
-
-engine = RuleEngine([rule])
-
-assert engine.evaluate(obj).match
-```

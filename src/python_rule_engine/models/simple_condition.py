@@ -12,14 +12,15 @@ from .condition import Condition
 
 
 class SimpleCondition(Condition):
-    operators_dict: SkipJsonSchema[Dict] = Field(..., exclude=True, repr=False)
-    _operator_object: SkipJsonSchema[Optional[Operator]] = PrivateAttr(None)
-
     path: Optional[JSONPath] = Field(None, description="A JSONPath expression to extract a value from the object")
     operator: str = Field(..., description="The operator to use for the comparison")
     value: Any = Field(..., description="The value to compare against")
     params: dict = Field({}, description="Additional parameters for the operator")
     match_detail: SkipJsonSchema[Any] = None
+
+    operators_dict: SkipJsonSchema[Dict] = Field(..., exclude=True, repr=False)
+    _operator_object: SkipJsonSchema[Optional[Operator]] = PrivateAttr(None)
+
 
     def __deepcopy__(self, memo=None):
         return self.model_copy(deep=False)
